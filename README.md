@@ -1,2 +1,2 @@
 # CrochetTracker
-An app that tracks crochet stitches so you don't loose your place.
+An app that tracks crochet stitches so you don't lose your place.
