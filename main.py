@@ -7,6 +7,14 @@ with open("fredHeadAndBodyPattern.txt") as file:
 c_pattern = pattern.splitlines()
 c_rounds_num = len(c_pattern)
 
+
+def multiply_stitch(mul, stitch):
+    txt = ''
+    for x in range(mul):
+        txt += (stitch + ', ')
+    return txt
+
+
 c_rounds = []
 
 # Parse string to store round number, steps, and number of total steps.
@@ -18,10 +26,10 @@ for item in c_pattern:
     c_rounds.append(new_c_round)
 
 # Convert steps into form that lists out all steps individually
-for item in c_rounds:
+for c_round in c_rounds:
     # For rounds with a step containing Brackets, convert to standard format
-    if '[' in item['steps']:
-        text = re.findall(r'\[(.*?)\]', item['steps'])[0]
+    if '[' in c_round['steps']:
+        text = re.findall(r'\[(.*?)\]', c_round['steps'])[0]
         # Breakdown:
         #     multi = item['steps'].split('x')
         #     multi_1 = multi[1]
@@ -29,13 +37,11 @@ for item in c_rounds:
         #     multi_3 = multi_2[0]
         #     multi_4 = multi_3.strip()
         #     multi_5 = int(multi_4)
-        multi = int(item['steps'].split('x')[1].split(',')[0].strip())
+        multi = int(c_round['steps'].split('x')[1].split(',')[0].strip())
 
-        new_text = ''
-        for x in range(multi):
-            new_text += (text + ', ')
+        new_text = multiply_stitch(multi, text)
 
-        split_steps = item['steps'].split(',')
+        split_steps = c_round['steps'].split(',')
         new_steps = ''
         for step in split_steps:
             index = split_steps.index(step)
@@ -44,6 +50,26 @@ for item in c_rounds:
                 split_steps.pop(index + 1)
             new_steps += split_steps[index].lstrip() + ', '
 
-        item['steps'] = new_steps.strip(', ')
+        c_round['steps'] = new_steps.strip(', ')
 
-    #TODO Go through steps and list out each stich type individually based on the number next to it
+    # skip starting round due to special case
+    if 'start' in c_round['steps']:
+        continue
+
+    # Go through steps and list out each stitch type individually based on the number next to it
+    converted_step = ''
+    for step in c_round['steps'].split(','):
+        s_num = 1
+        s_type = ''
+
+        for split in step.split():
+            if split.isnumeric():
+                s_num = int(split)
+            else:
+                s_type = split
+
+        converted_step += multiply_stitch(s_num, s_type)
+
+    c_round['steps'] = converted_step.replace(',', '').strip()
+
+print(c_rounds)
